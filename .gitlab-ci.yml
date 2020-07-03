@@ -1,11 +1,5 @@
 image: node:10.16.0
 
-include:
-  - template: Code-Quality.gitlab-ci.yml
-  - template: SAST.gitlab-ci.yml
-  - template: Container-Scanning.gitlab-ci.yml
-  - template: Dependency-Scanning.gitlab-ci.yml
-
 stages:
   - install
   - test
@@ -24,7 +18,6 @@ install:
     paths:
       - node_modules/
 
-
 tests:
   stage: test
   variables:
@@ -39,34 +32,3 @@ tests:
   script:
     - npm run test:ci
   coverage: '/Statements.*?(\d+(?:\.\d+)?)%/'
-
-build:
-  stage: build
-  variables:
-    BUILD_CONFIG: 'production'
-  dependencies:
-    - install
-  script:
-    - npm run build:ci
-  artifacts:
-    expire_in: 1h
-    paths:
-      - dist/
-  only:
-    - master
-
-pages:
-  stage: deploy
-  dependencies:
-    - build
-  script:
-    - mkdir public
-    - mv ./dist/codelab-angular-devops/* ./public/
-    - cp public/index.html public/404.html
-  artifacts:
-    paths:
-      - public/
-  environment:
-    name: production
-  only:
-    - master
